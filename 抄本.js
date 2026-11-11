@@ -218,8 +218,9 @@ function 结尾(s) {
   for (const t of s.第一本) out.push("  " + t);
   out.push("第 7 天夜里，你抄给第 8 天的是：");
   if (s.本.length) for (const 行 of s.本) out.push("  " + 字(行)); else out.push("  （空的）");
-  out.push(""); out.push("妹妹那七天：");
+  out.push(""); out.push("妹妹那几天：");
   const m = s.妹;
+  const 带着 = s.本.some(行 => 行.k === '妹妹' && 行.v === 'need') && !m.好了;
   for (let d = 1; d <= 天数; d++) {
     let t;
     if (m.记[d] !== undefined) t = m.记[d];
@@ -228,7 +229,9 @@ function 结尾(s) {
     else t = '他没来。我也没叫他。';
     out.push(`  第 ${d} 天　${t}`);
   }
+  if (带着) out.push(`  第 ${天数 + 1} 天　他来了，拎着一袋挂面。`);
   if (m.好了) out.push("  后来：第二个月我去上班了。");
+  else if (带着) out.push("  后来：那阵子他隔两天来一回。第二个月我去上班了。");
   else if (m.难 === 1) out.push("  后来：他来过一回，看见了冰箱。后来他没再来，我也没叫他。");
   else out.push("  后来：那阵子我谁也没告诉。我以为他知道。");
   const c = s.陈;
