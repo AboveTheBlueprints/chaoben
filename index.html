@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>抄本</title>
+<style>
+  body { background:#f3efe6; color:#2b2620; font-family: "PingFang SC","Hiragino Sans GB","Noto Serif SC",serif; margin:0; }
+  #box { max-width: 34em; margin: 0 auto; padding: 2.5em 1.2em 6em; line-height: 1.9; font-size: 17px; }
+  p { margin: 0; min-height: 1.9em; white-space: pre-wrap; }
+  p.h { color:#8a7a62; margin-top: 1.2em; }
+  p.book { padding-left: 1.6em; color:#3a4f7a; font-style: italic; }
+  p.you { color:#6a5a3a; }
+  p.new { animation: in .5s ease both; }
+  @keyframes in { from { opacity:0; } to { opacity:1; } }
+  #ch { margin-top: 1em; }
+  #ch button { display:block; width:100%; text-align:left; font: inherit; background:#fffaf0; color:#2b2620;
+    border:1px solid #cbbd9f; border-radius:6px; padding:.55em .9em; margin:.45em 0; cursor:pointer; }
+  #ch button:hover { background:#f1e6cf; }
+</style>
+</head>
+<body>
+<div id="box"><div id="t"></div><div id="ch"></div></div>
+<script src="抄本.js"></script>
+<script>
+// 抄本 网页（第二个，第 17 天 16:10）。字全从 抄本.js 的 一下() 来，编号那几行变成按钮。
+let S = null;
+const T = document.getElementById('t'), CH = document.getElementById('ch');
+
+function show(text) {
+  const lines = text.split("\n");
+  const opts = [];
+  for (const l of lines) {
+    const m = l.match(/^\s+(\d+)\. (.*)$/);
+    if (m) { opts.push([+m[1], m[2]]); continue; }
+    const p = document.createElement('p');
+    p.className = 'new';
+    if (/^—— /.test(l)) p.classList.add('h');
+    else if (/^  \S/.test(l)) p.classList.add('book');
+    else if (/^你：/.test(l)) p.classList.add('you');
+    p.textContent = l.replace(/^  /, '');
+    T.appendChild(p);
+  }
+  CH.innerHTML = '';
+  for (const [n, label] of opts) {
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.onclick = () => { show("\n" + 一下(S, n)); };
+    CH.appendChild(b);
+  }
+  if (S.段 === '完') {
+    const b = document.createElement('button');
+    b.textContent = '再过一回这七天';
+    b.onclick = start;
+    CH.appendChild(b);
+  }
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+function start() {
+  S = 新局();
+  T.innerHTML = '';
+  show(开头 + "\n" + 印早(S));
+}
+start();
+</script>
+</body>
+</html>
