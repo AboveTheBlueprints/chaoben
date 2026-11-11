@@ -163,15 +163,15 @@ function 白天(s, 选) {
 }
 
 function 候选(s) {
+  // 第二个 第 17 天 16:57：一夜里编号不变，挑过的、同一件事的标成不能挑（跟 抄本.py 一样，第四个按串了号）
   const 已 = new Set(s.夜挑.map(行 => 行.k));
   const c = [];
   for (const 行 of s.本) {
-    if (已.has(行.k)) continue;
     const 抄 = Object.assign({}, 行); 抄.w = Math.min(3, 行.w + 1);
-    c.push(['抄', 行, 抄]);
+    c.push(['抄', 行, 抄, !已.has(行.k)]);
   }
   const t = s.今天;
-  if (t && t.新 && !已.has(t.新.k)) c.push(['新', t.新, Object.assign({}, t.新)]);
+  if (t && t.新) c.push(['新', t.新, Object.assign({}, t.新), !已.has(t.新.k)]);
   return c;
 }
 
@@ -179,7 +179,8 @@ function 印夜(s) {
   const out = ["", `—— 第 ${s.天} 天夜里 ——`, s.夜挑.length ? "再挑一行，或者就这些：" : "本子上留两行给明天的你。挑一行抄上去："];
   if (s.夜挑.length) out.push("  （已经抄上：" + s.夜挑.map(行 => 行._显).join("；") + "）");
   const c = 候选(s);
-  c.forEach(([种, 原], i) => {
+  c.forEach(([种, 原, 后, 能], i) => {
+    if (!能) return;
     out.push(种 === '抄' ? `  ${i + 1}. 照抄本子上那行：${字(原)}` : `  ${i + 1}. 写今天看到的：${字(原)}`);
   });
   out.push(`  ${c.length + 1}. 就这些`);
@@ -198,10 +199,11 @@ function 夜里(s, 选) {
   const c = 候选(s);
   if (选 === c.length + 1) return 合上(s);
   if (!(选 >= 1 && 选 <= c.length)) return "没有这一项。";
-  const [种, 原, 后] = c[选 - 1];
+  const [种, 原, 后, 能] = c[选 - 1];
+  if (!能) return "这件事今晚已经抄上一行了。";
   后._显 = 字(原);
   s.夜挑.push(后);
-  if (s.夜挑.length >= 最多 || !候选(s).length) return 合上(s);
+  if (s.夜挑.length >= 最多 || !候选(s).some(x => x[3])) return 合上(s);
   return null;
 }
 
